@@ -51,21 +51,50 @@ exports.getAllSauce = (req, res, next) => {
 };
 
 exports.like = (req, res, next) => {
-    if (like = 1) {
-        userId.push.usersLiked;
-        likes += 1;
-    }
-    if (like = 0) {
-        if (userId && likes == 1) {
-            likes -= 1;
-        }
-        if (userId && dislikes == 1) {
-            deslikes -= 1;
-        }
-    }
-    if (like = -1) {
-        userId.push.usersDisliked;
-        dislikes += 1;
-    }
+    const userId = req.body.userId;
+    const likes = req.body.like;
+    const dislikes = req.body.dislikes;
+    const usersLiked = req.body.usersLiked;
+    const usersDisliked = req.body.usersDisliked;
 
-}
+    Sauce.findOne({_id: req.params.id})
+        .then(sauce => {
+            switch(likes) {
+                case 1:
+                    Sauce.updateOne(
+                        {_id: req.params.id},
+                        {$push: {usersLiked: userId}, $inc: {likes: +1 }}
+                    )
+                        .catch(error => res.status(400).json({ error }));
+                break;
+
+                case 0:
+                    Sauce.updateOne(
+                        {_id: req.params.id},
+                        {$inc: {likes: -1 }}
+                    )
+                        .then(() => res.status(200).json({ message: 'Avis pris en compte'}))
+                        .catch(error => res.status(400).json({ error })); 
+                break;
+            
+                case -1:
+                    Sauce.updateOne(
+                        {_Id: req.params.id},
+                        {$push: {usersDisliked: userId}, $inc: {dislikes: +1 }}
+                    )
+                        .then(() => res.status(200).json({ message: 'Avis pris en compte'}))
+                        .catch(error => res.status(400).json({ error }));
+                break;
+
+                case 0:
+                    Sauce.updateOne(
+                        {_id: req.params.id},
+                        {$inc: {dislikes: -1 }}
+                    )
+                        .then(() => res.status(200).json({ message: 'Avis pris en compte'}))
+                        .catch(error => res.status(400).json({ error })); 
+                break;
+            }
+        })
+};
+
