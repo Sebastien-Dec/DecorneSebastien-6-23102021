@@ -52,49 +52,46 @@ exports.getAllSauce = (req, res, next) => {
 
 exports.like = (req, res, next) => {
     const userId = req.body.userId;
-    const likes = req.body.like;
-    const dislikes = req.body.dislikes;
-    const usersLiked = req.body.usersLiked;
-    const usersDisliked = req.body.usersDisliked;
-
+    const like = req.body.like;
+    
     Sauce.findOne({_id: req.params.id})
         .then(sauce => {
-            switch(likes) {
-                case 1:
-                    Sauce.updateOne(
-                        {_id: req.params.id},
-                        {$push: {usersLiked: userId}, $inc: {likes: +1 }}
-                    )
+            if(like === 1) {
+                if(!sauce.usersLiked.includes(userId)) {
+                    sauce.likes++;
+                    sauce.usersLiked.push(userId);
+                    sauce.save()
+                        .then(() => res.status(201).json({message: 'Vous aimez cette sauce !'}))
                         .catch(error => res.status(400).json({ error }));
-                break;
-
-                case 0:
-                    Sauce.updateOne(
-                        {_id: req.params.id},
-                        {$inc: {likes: -1 }}
-                    )
-                        .then(() => res.status(200).json({ message: 'Avis pris en compte'}))
-                        .catch(error => res.status(400).json({ error })); 
-                break;
-            
-                case -1:
-                    Sauce.updateOne(
-                        {_Id: req.params.id},
-                        {$push: {usersDisliked: userId}, $inc: {dislikes: +1 }}
-                    )
-                        .then(() => res.status(200).json({ message: 'Avis pris en compte'}))
+                } else {
+                    res.status(403).json({ message: 'Vous ne pouvez pas aimé de nouveau cette sauce !'})
+                }       
+            } else if(like === -1) {
+                if(!sauce.usersDisliked.includes(userId)) {
+                    sauce.dislikes++;
+                    sauce.userDisliked.push(userId);
+                    sauce.save()
+                        .then(() => res.status(201).json({message: "Vous n'aimez pas cette sauce !"}))
                         .catch(error => res.status(400).json({ error }));
-                break;
-
-                case 0:
-                    Sauce.updateOne(
-                        {_id: req.params.id},
-                        {$inc: {dislikes: -1 }}
-                    )
-                        .then(() => res.status(200).json({ message: 'Avis pris en compte'}))
-                        .catch(error => res.status(400).json({ error })); 
-                break;
+                } else {
+                    res.status(403).json({ message: 'Vous ne pouvez pas détester de nouveau cette sauce !'})
+                }
+            } else if(like === 0) {
+                if(sauce.usersLiked.includes(userId)) {
+                    sauce.likes--;
+                    sauce.save()
+                        .then(() => res.status(200).json({message: "Vous n'aimez plus cette sauce !"}))
+                        .catch(error => res.status(400).json({ error }));
+                } else if(sauce.usersDisliked.includes(userId)) {
+                    sauce.dislikes--;
+                    sauce.save()
+                        .then(() => res.status(200).json({message: "Vous ne détestez plus cette sauce !"}))
+                        .catch(error => res.status(400).json({ error }));
+                } else {
+                    res.status(403).json({message: "Vous ne pouvez plus agir avec cette sauce !"})
+                }
             }
         })
+        .catch(error => res.status(500).json({ error }));
 };
 
