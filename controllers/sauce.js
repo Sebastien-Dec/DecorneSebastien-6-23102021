@@ -51,21 +51,48 @@ exports.getAllSauce = (req, res, next) => {
 };
 
 exports.like = (req, res, next) => {
-    if (like = 1) {
-        userId.push.usersLiked;
-        likes += 1;
-    }
-    if (like = 0) {
-        if (userId && likes == 1) {
-            likes -= 1;
-        }
-        if (userId && dislikes == 1) {
-            deslikes -= 1;
-        }
-    }
-    if (like = -1) {
-        userId.push.usersDisliked;
-        dislikes += 1;
-    }
+    
+    const userId = req.body.userId;
+    const like = req.body.like;
+    
+    Sauce.findOne({_id: req.params.id})
+        .then(sauce => {
+            if(like === 1) {
+                if(!sauce.usersLiked.includes(userId)) {
+                    sauce.likes++;
+                    sauce.usersLiked.push(userId);
+                    sauce.save()
+                        .then(() => res.status(201).json({message: 'Vous aimez cette sauce !'}))
+                        .catch(error => res.status(400).json({ error }));
+                } else {
+                    res.status(403).json({ message: 'Vous ne pouvez pas aimé de nouveau cette sauce !'})
+                }       
+            } else if(like === -1) {
+                if(!sauce.usersDisliked.includes(userId)) {
+                    sauce.dislikes++;
+                    sauce.usersDisliked.push(userId);
+                    sauce.save()
+                        .then(() => res.status(201).json({message: "Vous n'aimez pas cette sauce !"}))
+                        .catch(error => res.status(400).json({ error }));
+                } else {
+                    res.status(403).json({ message: 'Vous ne pouvez pas détester de nouveau cette sauce !'})
+                }
+            } else if(like === 0) {
+                if(sauce.usersLiked.includes(userId) && sauce.likes > 0) {
+                    sauce.likes--;
+                    sauce.save()
+                        .then(() => res.status(200).json({message: "Vous n'aimez plus cette sauce !"}))
+                        .catch(error => res.status(400).json({ error }));
+                } else if(sauce.usersDisliked.includes(userId) && sauce.dislikes > 0) {
+                    sauce.dislikes--;
+                    sauce.save()
+                        .then(() => res.status(200).json({message: "Vous ne détestez plus cette sauce !"}))
+                        .catch(error => res.status(400).json({ error }));
+                } else {
+                    res.status(403).json({message: "Vous ne pouvez plus agir avec cette sauce !"});
+                };
+            };
+        })
+        .catch(error => res.status(500).json({ error }));
+};
 
-}
