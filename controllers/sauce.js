@@ -51,6 +51,7 @@ exports.getAllSauce = (req, res, next) => {
 };
 
 exports.like = (req, res, next) => {
+    
     const userId = req.body.userId;
     const like = req.body.like;
     
@@ -69,7 +70,7 @@ exports.like = (req, res, next) => {
             } else if(like === -1) {
                 if(!sauce.usersDisliked.includes(userId)) {
                     sauce.dislikes++;
-                    sauce.userDisliked.push(userId);
+                    sauce.usersDisliked.push(userId);
                     sauce.save()
                         .then(() => res.status(201).json({message: "Vous n'aimez pas cette sauce !"}))
                         .catch(error => res.status(400).json({ error }));
@@ -77,20 +78,20 @@ exports.like = (req, res, next) => {
                     res.status(403).json({ message: 'Vous ne pouvez pas détester de nouveau cette sauce !'})
                 }
             } else if(like === 0) {
-                if(sauce.usersLiked.includes(userId)) {
+                if(sauce.usersLiked.includes(userId) && sauce.likes > 0) {
                     sauce.likes--;
                     sauce.save()
                         .then(() => res.status(200).json({message: "Vous n'aimez plus cette sauce !"}))
                         .catch(error => res.status(400).json({ error }));
-                } else if(sauce.usersDisliked.includes(userId)) {
+                } else if(sauce.usersDisliked.includes(userId) && sauce.dislikes > 0) {
                     sauce.dislikes--;
                     sauce.save()
                         .then(() => res.status(200).json({message: "Vous ne détestez plus cette sauce !"}))
                         .catch(error => res.status(400).json({ error }));
                 } else {
-                    res.status(403).json({message: "Vous ne pouvez plus agir avec cette sauce !"})
-                }
-            }
+                    res.status(403).json({message: "Vous ne pouvez plus agir avec cette sauce !"});
+                };
+            };
         })
         .catch(error => res.status(500).json({ error }));
 };
