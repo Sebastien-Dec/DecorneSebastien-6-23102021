@@ -1,6 +1,8 @@
+//Importing the HTTP package
 const http = require('http');
 const app = require('./app');
 
+//Determine a valid port (numeric or character string)
 const normalizePort = val => {
     const port = parseInt(val, 10);
     if (isNaN(port)) {
@@ -16,6 +18,7 @@ const port = normalizePort(process.env.PORT || '3000');
 
 app.set('port', port);
 
+//Research and management of any errors
 const errorHandler = error => {
     if (error.syscall !== 'listen') {
         throw error;
@@ -35,7 +38,7 @@ const errorHandler = error => {
             throw error;
     }
 };
-
+//Server Creation
 const server = http.createServer(app);
 server.on('error', errorHandler);
 server.on('listening', () => {
@@ -44,4 +47,5 @@ server.on('listening', () => {
     console.log('Listening on ', bind);
 });
 
+//Server execution port or channel logging
 server.listen(port);
