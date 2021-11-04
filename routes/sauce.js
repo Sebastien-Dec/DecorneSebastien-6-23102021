@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
+//To store the request file
 const multer = require('../middleware/multer-config');
+//Require user authentication
 const auth = require('../middleware/authorize');
+//Access middleware
 const sauceCtrl = require('../controllers/sauce');
 
 //Creating routes

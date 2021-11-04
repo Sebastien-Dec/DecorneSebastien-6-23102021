@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
+//Access middleware
 const userCtrl = require('../controllers/users');
 
 //Creating routes
