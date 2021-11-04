@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+//Creation of the data schema for the sauces
 const sauceSchema = mongoose.Schema({
     userId: { type: String, required: true },
     name: { type: String, required: true },
