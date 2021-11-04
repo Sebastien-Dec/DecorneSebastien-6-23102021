@@ -14,6 +14,7 @@ const normalizePort = val => {
     return false;
 };
 
+//Creation of a server port
 const port = normalizePort(process.env.PORT || '3000');
 
 app.set('port', port);
