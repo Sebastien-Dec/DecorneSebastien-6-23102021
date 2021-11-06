@@ -27,7 +27,7 @@ app.use(express.json());
 app.use('/api/auth', userRoutes);
 //Specifies the path for actions on the sauces
 app.use('/api/sauces', sauceRoutes);
-//Send the file to the images directory
+//Get the url of the image
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;
